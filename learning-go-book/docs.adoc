@@ -1,0 +1,25 @@
+= Heading
+
+Some information.
+
+```go
+package main
+import (
+    "os"
+    "fmt"
+)
+func main () {
+    fmt.Println("hello,world!")
+}
+```
+
+[IMPORTANT]
+.Please pay attention to the following points
+====
+Use an example block to create an admonition that contains complex content, such as (but not limited to):
+
+* Lists
+* Multiple paragraphs
+* Source code
+* Images
+====

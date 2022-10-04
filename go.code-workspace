@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"workbench.colorTheme": "Aurora",
+		"workbench.preferredDarkColorTheme": "Aurora",
+		"workbench.preferredHighContrastColorTheme": "Aurora",
+		"workbench.preferredHighContrastLightColorTheme": "Aurora",
+		"workbench.preferredLightColorTheme": "Aurora"
+	}
+}

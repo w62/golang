@@ -1,0 +1,16 @@
+{
+    "workbench.colorTheme": "Aurora",
+    "workbench.preferredDarkColorTheme": "Aurora",
+    "workbench.preferredHighContrastColorTheme": "Aurora",
+    "workbench.preferredHighContrastLightColorTheme": "Aurora",
+    "workbench.preferredLightColorTheme": "Aurora",
+    "terminal.integrated.fontSize": 16,
+    "[go]": {
+        "editor.insertSpaces": true,
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "golang.go",
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": false
+        }
+    },
+}
