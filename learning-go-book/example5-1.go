@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"time"
 	"sort"
+	"io"
+	"log"
 )
 
 func main () {
@@ -106,15 +108,66 @@ func main () {
 	})
 	fmt.Println(people)
 
-	twoBase := makeMult(2)
-	threeBase := makeMult(3)
+	var base0 int = 2
+	var base1 int = 3
+	var factor int = 5
+
+	var twoBase func(int) (int) = makeMult(base0)
+	var threeBase func(int) (int) = makeMult(base1)
+
+	fmt.Println(makeMult(base0)(factor))
+	fmt.Println(makeMult(base1)(factor))
+
+	fmt.Println(twoBase(factor))
+	fmt.Println(threeBase(factor))
 
 	for i := 0; i < 6; i++ {
 		fmt.Println(i, twoBase(i), threeBase(i))
 	}
 
+	if len(os.Args) < 2{
+		log.Fatal("no file specified")
+	}
+
+	f, err := os.Open(os.Args[1])
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer f.Close()
+	data := make([]byte, 2048)
+	for {
+		count, err := f.Read(data)
+		os.Stdout.Write(data[:count])
+		if err != nil {
+			if err != io.EOF {
+				log.Fatal(err)
+			}
+			break
+		}
+	}
+
+	f, closer, err := getFile(os.Args[1])
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer closer()
+
 }
 // main ends here 
+
+
+func getFile(name string) (*os.File, func(), error) {
+	file, err := os.Open(name)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return file, func () {
+		file.Close()
+		fmt.Println("deferred close.")
+	}, nil
+}
 
 func makeMult(base int) func (int) int {
 	return func(factor int) int {
