@@ -6,13 +6,10 @@ import (
 
 func main () {
 
-	x := 10
+	var x *int
 
-	pointerToX := &x
-	fmt.Println(pointerToX)
-	fmt.Println(*pointerToX)
+	fmt.Println(x == nil)
+	fmt.Println(*x)
 
-	z:= 5 + *pointerToX
-	fmt.Println(z)
 
 }
