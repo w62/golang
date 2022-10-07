@@ -9,7 +9,39 @@ import (
 	"sort"
 )
 
+type person struct {
+	age int
+	name string
+}
+
+func modMap(m map [int]string) {
+	m[2] = "hello"
+	m[3] = "goodbye"
+	delete(m,1)
+}
+
+func modSlice(s []int) {
+	for k, v := range s {
+		s[k] = v * 2
+	}
+	s = append(s,10)
+}
+
 func main () {
+
+	m := map[int]string{
+		1: "first",
+		2: "second",
+	}
+
+	modMap(m)
+	fmt.Println(m)
+
+	s := []int{1, 2, 3}
+	modSlice(s)
+	fmt.Println(s)
+
+
 	fmt.Println(addTo(3))
 	fmt.Println(addTo(3, 2))
 	fmt.Println(addTo(3, 2, 4, 6, 8))
@@ -113,8 +145,23 @@ func main () {
 		fmt.Println(i, twoBase(i), threeBase(i))
 	}
 
+
+	p := person{}
+	i := 2
+	s1 := "hello"
+
+	fmt.Println(i, s1, p)
+	modifyFails(i, s1, p)
+	fmt.Println(i, s1, p)
+
 }
 // main ends here 
+
+func modifyFails (i int, s string, p person) {
+	i = i *2
+	s = "Goodbye"
+	p.name = "Bob"
+}
 
 func makeMult(base int) func (int) int {
 	return func(factor int) int {
