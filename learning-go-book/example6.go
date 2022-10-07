@@ -6,7 +6,7 @@ import (
 
 func main () {
 
-	var x *int
+	var x = new(int)
 
 	fmt.Println(x == nil)
 	fmt.Println(*x)
