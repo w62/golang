@@ -23,7 +23,7 @@ func main() {
 
 	fmt.Println(d)
 
-	f:= func() {
+	var f func() = func () {
 			fmt.Println("hello go")
 	}
 
