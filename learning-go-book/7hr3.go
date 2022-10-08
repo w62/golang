@@ -14,6 +14,33 @@ func main() {
 	s := sum(1, 2, 3, 4, 5)
 	fmt.Println("The sum is", *s)
 
+	d, err := divide(5.0, 1.0)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(d)
+
+	f:= func() {
+			fmt.Println("hello go")
+	}
+
+	f()
+
+}
+
+
+func divide(a, b float64) (float64, error) {
+	if b == 0.0 {
+		return 0.0, fmt.Errorf("cannot divide by zero")
+	}
+	return a / b, nil
+}
+
+func dump (a, b float64) (float64, float64, error) {
+	return a, b, nil
 }
 
 type myStruct struct {
