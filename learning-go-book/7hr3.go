@@ -7,9 +7,9 @@ import (
 func main() {
 	var ms *myStruct
 	ms = new(myStruct)
-	(*ms).foo = 42 // deferencing has lower priorty of the dot notation
-	// https://www.youtube.com/watch?v=YS4e4q9oBaU%t=4:14:31
-	fmt.Println((*ms).foo)
+	ms.foo = 42 // 𨳒，咁都得
+	// https://www.youtube.com/watch?v=YS4e4q9oBaU%t=4:15:11
+	fmt.Println(ms.foo) // 𨳒，咁都得
 }
 
 type myStruct struct {
