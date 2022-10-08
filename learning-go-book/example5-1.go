@@ -31,6 +31,12 @@ func modSlice(s []int) {
 
 func main () {
 
+	f1 := 10.2
+	g1 := 3.7
+
+	fmt.Println(f1*g1)
+// 	fmt.Println(f1%g1)  <- this doesn't compile
+
 	m := map[int]string{
 		1: "first",
 		2: "second",
@@ -147,6 +153,8 @@ func main () {
 	var twoBase func(int) (int) = makeMult(base0)
 	var threeBase func(int) (int) = makeMult(base1)
 
+	fmt.Printf("value is: %v, Type is: %T", twoBase, twoBase)
+
 	fmt.Println(makeMult(base0)(factor))
 	fmt.Println(makeMult(base1)(factor))
 
@@ -157,7 +165,6 @@ func main () {
 		fmt.Println(i, twoBase(i), threeBase(i))
 	}
 
-<<<<<<< HEAD
 
 	p := person{}
 	i := 2
@@ -166,7 +173,6 @@ func main () {
 	fmt.Println(i, s1, p)
 	modifyFails(i, s1, p)
 	fmt.Println(i, s1, p)
-=======
 	if len(os.Args) < 2{
 		log.Fatal("no file specified")
 	}
@@ -194,17 +200,15 @@ func main () {
 		log.Fatal(err)
 	}
 	defer closer()
->>>>>>> refs/remotes/origin/main
 
 }
 // main ends here 
 
-<<<<<<< HEAD
 func modifyFails (i int, s string, p person) {
 	i = i *2
 	s = "Goodbye"
 	p.name = "Bob"
-=======
+}
 
 func getFile(name string) (*os.File, func(), error) {
 	file, err := os.Open(name)
@@ -216,7 +220,6 @@ func getFile(name string) (*os.File, func(), error) {
 		file.Close()
 		fmt.Println("deferred close.")
 	}, nil
->>>>>>> refs/remotes/origin/main
 }
 
 func makeMult(base int) func (int) int {
