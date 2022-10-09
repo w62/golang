@@ -15,6 +15,7 @@ func Hello(name string) (string, error) {
 	}
 	// Create a message using a random format.
 	message := fmt.Sprintf(randomFormat(), name)
+	// message := fmt.Sprint(randomFormat()) // for failed test
 	return message, nil
 }
 
