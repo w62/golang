@@ -29,9 +29,39 @@ func main() {
 
 	f()
 
+	g := greeter {
+		greeting: "hello",
+		name: "go",
+	}
+
+	g.greet()
+
+	var myF myFunc = myadd
+
+	fmt.Println(myF(3, 5), myF.yoyo())
+
+}
+
+type myFunc func (x int, y int)(int)  
+
+func (m myFunc) yoyo() int {
+	fmt.Println("yo yo")
+	return 10
 }
 
 
+func myadd (x, y int) int {
+	return x + y
+}
+
+	func (g greeter) greet() {
+		fmt.Println(g.greeting, g.name)
+	}
+
+	type greeter struct {
+		greeting string
+		name string
+	}
 func divide(a, b float64) (float64, error) {
 	if b == 0.0 {
 		return 0.0, fmt.Errorf("cannot divide by zero")
