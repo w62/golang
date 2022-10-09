@@ -3,6 +3,9 @@ package main
 // https://go.dev/doc/tutorial/call-module-code
 
 // https://go.dev/doc/tutorial/handle-errors
+
+// https://go.dev/doc/tutorial/random-greeting
+// https://go.dev/doc/tutorial/greetings-multiple-people
 import (
 	"fmt"
 	"log"
@@ -17,8 +20,11 @@ func main() {
 	log.SetPrefix("greetings: ")
 	log.SetFlags(0)
 
-	// Request a greeting message.
-	message, err := greetings.Hello("Gladys")
+	// A slice of names.
+	names := []string{"Gladys", "Samantha", "Darrin"}
+
+	// Request greeting messages for the names.
+	message, err := greetings.Hellos(names)
 	// If an error was returned, print it to the console and 
 	// exit the program.
 	if err != nil {
