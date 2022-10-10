@@ -82,6 +82,10 @@ func main() {
 
 //SumIntsOrFloats sums the values of map m. It supports both int64 and float64
 // as types for map values.
+
+//Notably, this includes anything that can be used as a map key, including arrays, structs with comparable fields but not interfaces.
+// https://stackoverflow.com/questions/70562572/in-go-generics-why-cant-i-use-comparable-constraint-with-order-operators
+// That is why K is of type comparable
 func SumIntsOrFloats[K comparable, V int64 | float64](m map[K]V) V {
 	var s V
 	for _, v := range m {
