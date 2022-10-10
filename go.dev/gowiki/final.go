@@ -1,37 +1,36 @@
+// Copyright 2010 The Go Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+//go:build ignore
+
 package main
-// Writing Web Applications
-//Up to here:
-// https://go.dev/doc/articles/wiki/#tmp_2
-// Can write a file to disk at OS level
-// Now here https://go.dev/doc/articles/wiki/#tmp_4
-// The bare web server
 
 import (
 	"html/template"
-	"os"
 	"log"
 	"net/http"
+	"os"
 	"regexp"
 )
 
-
 type Page struct {
 	Title string
-	Body []byte
+	Body  []byte
 }
 
 func (p *Page) save() error {
-    filename := p.Title + ".txt"
-    return os.WriteFile(filename, p.Body, 0600)
+	filename := p.Title + ".txt"
+	return os.WriteFile(filename, p.Body, 0600)
 }
 
 func loadPage(title string) (*Page, error) {
-    filename := title + ".txt"
-    body, err := os.ReadFile(filename)
-    if err != nil {
-        return nil, err
-    }
-    return &Page{Title: title, Body: body}, nil
+	filename := title + ".txt"
+	body, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	return &Page{Title: title, Body: body}, nil
 }
 
 func viewHandler(w http.ResponseWriter, r *http.Request, title string) {
@@ -73,7 +72,7 @@ func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
 
 var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
 
-func makeHandler(fn func (http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
+func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		m := validPath.FindStringSubmatch(r.URL.Path)
 		if m == nil {
@@ -87,7 +86,8 @@ func makeHandler(fn func (http.ResponseWriter, *http.Request, string)) http.Hand
 func main() {
 	http.HandleFunc("/view/", makeHandler(viewHandler))
 	http.HandleFunc("/edit/", makeHandler(editHandler))
- 	http.HandleFunc("/save/", makeHandler(saveHandler))
+	http.HandleFunc("/save/", makeHandler(saveHandler))
+
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
