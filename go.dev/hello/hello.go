@@ -34,4 +34,5 @@ func main() {
 	// If no error was returned, print the returned message
 	// to the console.
 	fmt.Println(message)
+	fmt.Println(greetings.GoodLuck("Jim"))
 }

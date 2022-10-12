@@ -7,6 +7,13 @@ import (
 	"time"
 )
 
+var DefaultMessage = "Default message: How are you, "
+
+type people struct {
+	name string
+	age int
+}
+
 // Hello returns a greeting for the named person.
 func Hello(name string) (string, error) {
 	// If no name was given, return an error with a message.
