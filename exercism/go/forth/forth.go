@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"regexp"
 )
 
 type stack struct {
@@ -38,7 +39,9 @@ func Forth(input []string) ([]int, error) {
 		x []int
 	)
 
-	for _, s := range input {
+	my_input := match(input)
+
+	for _, s := range my_input {
 
 		//		fmt.Printf("row data=%s row: %d\n Type is: %-10T",s, i, s)
 		t := strings.Split(s, " ")
@@ -149,3 +152,57 @@ func Forth(input []string) ([]int, error) {
 
 	panic("Please implement the Forth function")
 }
+
+func match(input []string) (result []string) {
+
+	var output []string
+
+	lookup := make(map[string]string)
+
+	fmt.Println("input", input)
+	for _, s := range input {
+		// The regular expression means
+		// a line delimited by : and ;
+		// the first token must be alphabet with hyphen
+
+		cmd := regexp.MustCompile(`^: (?P<marco>[a-zA-Z.\-]+) (?P<details>.*) ;$`)
+		matched := cmd.FindString(s)
+
+		if matched == "" {
+			output = append(output, s)
+			continue
+		}
+
+		//removing leading : and trailing ;
+		// From ": hello over over ;"
+		// To   "hello over over"
+		matched = matched[2 : len(matched)-2]
+
+		re := regexp.MustCompile(`(?P<marco>[a-zA-Z.\-]+) (?P<details>.*)`)
+		results := re.FindStringSubmatch(matched)
+		fmt.Println("results: ", results)
+		marco := re.SubexpIndex("marco")
+		details := re.SubexpIndex("details")
+
+		fmt.Printf("%s expanded to %s\n", results[marco], results[details])
+
+		lookup[results[marco]] = results[details]
+	}
+
+	fmt.Println("maps:", lookup)
+
+	for token, value := range lookup {
+		fmt.Println("token", token)
+		fmt.Println("value", value)
+		temp := regexp.MustCompile(token)
+		for i, s := range output {
+			fmt.Println("s", s, "i", i)
+			output[i] = temp.ReplaceAllString(output[i], value)
+		}
+	}
+	fmt.Println(" after output ", output)
+
+	return output
+
+}
+
