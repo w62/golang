@@ -10,21 +10,6 @@ import (
 	"regexp"
 )
 
-type stack struct {
-	items []int
-}
-
-func (s *stack) push(i int) {
-	s.items = append(s.items, i)
-}
-
-func (s *stack) pop() int {
-	l := len(s.items) - 1
-	toRemove := s.items[l]
-	s.items = s.items[:l]
-	return toRemove
-}
-
 // Forth implements a basic Forth expression evaluator.
 // Input is a slice of strings. Initially I naively thought that it passes
 // everything in a token. Yet after some testings, it probably supplies
@@ -33,7 +18,13 @@ func (s *stack) pop() int {
 // 1. Extract the input into tokens is successful.
 func Forth(input []string) ([]int, error) {
 
-	fmt.Printf("raw input=%s rows=%d\n Type is: %-10T", input, len(input), input)
+	if len(input) == 0 {
+		fmt.Println("nil input")
+	} else {
+		fmt.Println("some input")
+	}
+
+	fmt.Printf("raw input=%s rows=%d\n", input, len(input))
 
 	var (
 		x []int
@@ -41,9 +32,11 @@ func Forth(input []string) ([]int, error) {
 
 	my_input := match(input)
 
+	fmt.Printf("my_input=%s rows=%d\n", my_input, len(my_input))
+
 	for _, s := range my_input {
 
-		//		fmt.Printf("row data=%s row: %d\n Type is: %-10T",s, i, s)
+				fmt.Printf("row data=%s \n ",s)
 		t := strings.Split(s, " ")
 
 		for _, token := range t {
@@ -86,19 +79,19 @@ func Forth(input []string) ([]int, error) {
 						}
 						x = append(x, p/q)
 
-					case ";":
-
 					default:
 						return x, errors.New("Unknown arithemic operator")
 					}
 
 				} else { // dup drop swap over
 					if len(x) <=0 {
-						return x, errors.New("Nothing to Operate. stack underflow")
+						fmt.Println("x is:", x)
+						s := fmt.Sprintf("error %v\n", x)
+						return x, errors.New(s)
+						//return x, errors.New("Nothing to Operate.  really here? stack underflow")
 					}
 
 
-					//					fmt.Printf("operator=%s\n", token)
 
 					token = strings.ToUpper(token)
 
@@ -147,7 +140,7 @@ func Forth(input []string) ([]int, error) {
 		}
 	}
 
-	fmt.Printf("x=%v len=%d", x, len(x))
+	fmt.Printf("final x=%v len=%d\n", x, len(x))
 	return x, nil
 
 	panic("Please implement the Forth function")
@@ -165,42 +158,84 @@ func match(input []string) (result []string) {
 		// a line delimited by : and ;
 		// the first token must be alphabet with hyphen
 
-		cmd := regexp.MustCompile(`^: (?P<marco>[a-zA-Z.\-]+) (?P<details>.*) ;$`)
+		s = strings.ToUpper(s)
+		
+/*
+		operator := opr.FindString(s) 
+		if operator != "" {
+			panic("operator found!")
+			fmt.Println("operator found.", operator)
+			return output
+		}
+*/ 
+//		opr := regexp.MustCompile(`^: (?P<marco>[\+\-\*\/]) (?P<details>.*) ;$`)
+pattern := `^: (?P<marco>[a-zA-Z.+-/*\-]+) (?P<details>.*) ;$`
+		cmd := regexp.MustCompile(pattern)
+
 		matched := cmd.FindString(s)
 
 		if matched == "" {
+			
 			output = append(output, s)
 			continue
 		}
 
+		fmt.Println("matched :", matched)
+		fmt.Println("matched len:", len(matched))
 		//removing leading : and trailing ;
 		// From ": hello over over ;"
 		// To   "hello over over"
-		matched = matched[2 : len(matched)-2]
+//		matched = matched[2 : len(matched)-2]
+//		fmt.Println("matched shrinked:", matched)
 
-		re := regexp.MustCompile(`(?P<marco>[a-zA-Z.\-]+) (?P<details>.*)`)
-		results := re.FindStringSubmatch(matched)
-		fmt.Println("results: ", results)
-		marco := re.SubexpIndex("marco")
-		details := re.SubexpIndex("details")
+//		re := regexp.MustCompile(pattern)
+//		results := re.FindStringSubmatch(matched)
 
-		fmt.Printf("%s expanded to %s\n", results[marco], results[details])
+		results := cmd.FindStringSubmatch(matched)
+		fmt.Println("results shrinked:", results)
+
+//		marco := re.SubexpIndex("marco")
+//		details := re.SubexpIndex("details")
+
+		marco := cmd.SubexpIndex("marco")
+		details := cmd.SubexpIndex("details")
+/*d10
+		v, ok := lookup[results[marco]]
+		if ok {
+		temp := regexp.MustCompile(v)
+		for i, _ := range output {
+			output[i] = temp.ReplaceAllString(output[i], v)
+		}
+		lookup[results[marco]] = v
+		}
+		*/
+
+
 
 		lookup[results[marco]] = results[details]
 	}
 
 	fmt.Println("maps:", lookup)
+	fmt.Println("output:", output)
+
 
 	for token, value := range lookup {
-		fmt.Println("token", token)
-		fmt.Println("value", value)
+			fmt.Println("token", token)
+			switch token {
+			case "+":
+				token = "\\+"
+			case "-":
+				token = "\\-"
+			case "*":
+				token = "\\*"
+			case "\\":
+			default:
+			}
 		temp := regexp.MustCompile(token)
-		for i, s := range output {
-			fmt.Println("s", s, "i", i)
+		for i, _ := range output {
 			output[i] = temp.ReplaceAllString(output[i], value)
 		}
 	}
-	fmt.Println(" after output ", output)
 
 	return output
 
