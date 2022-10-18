@@ -5,9 +5,9 @@ package forth
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
-	"regexp"
 )
 
 // Forth implements a basic Forth expression evaluator.
@@ -30,13 +30,15 @@ func Forth(input []string) ([]int, error) {
 		x []int
 	)
 
-	my_input := match(input)
+	fmt.Printf("Before calling match my_input=%s rows=%d\n", input, len(input))
 
-	fmt.Printf("my_input=%s rows=%d\n", my_input, len(my_input))
+	input = match(input)
 
-	for _, s := range my_input {
+	fmt.Printf("After calling my_input=%s rows=%d\n", input, len(input))
 
-				fmt.Printf("row data=%s \n ",s)
+	for _, s := range input {
+
+		fmt.Printf("row data=%s \n ", s)
 		t := strings.Split(s, " ")
 
 		for _, token := range t {
@@ -50,7 +52,7 @@ func Forth(input []string) ([]int, error) {
 				//				fmt.Printf("operand=%d\n", operand)
 			} else { // got an operator
 
-				if len(token) == 1 {  // +-*/
+				if len(token) == 1 { // +-*/
 					if len(x) < 2 {
 						return x, errors.New("Not enough operands")
 					}
@@ -84,44 +86,42 @@ func Forth(input []string) ([]int, error) {
 					}
 
 				} else { // dup drop swap over
-					if len(x) <=0 {
+					if len(x) <= 0 {
 						fmt.Println("x is:", x)
 						s := fmt.Sprintf("error %v\n", x)
 						return x, errors.New(s)
 						//return x, errors.New("Nothing to Operate.  really here? stack underflow")
 					}
 
-
-
-					token = strings.ToUpper(token)
+//					token = strings.ToUpper(token)
 
 					switch token {
 					case "DUP":
-					if len(x) <1 {
-						return x, errors.New("Nothing to Dup. stack underflow")
-					} else {
-						x = append(x, x[len(x)-1])
-					}
+						if len(x) < 1 {
+							return x, errors.New("Nothing to Dup. stack underflow")
+						} else {
+							x = append(x, x[len(x)-1])
+						}
 					case "DROP":
-						if len(x) <1 {
+						if len(x) < 1 {
 							return x, errors.New("Nothing to drop. stack underflow")
 						} else {
 							x = x[:len(x)-1]
 						}
 					case "SWAP":
-						if len(x) <2 {
+						if len(x) < 2 {
 							return x, errors.New("Not enough elements to swap.")
 						} else {
 							l := len(x) - 1
 							m := len(x) - 2
 							q := x[l]
 							p := x[m]
-							x = x [:m]
+							x = x[:m]
 							x = append(x, q)
 							x = append(x, p)
 						}
 					case "OVER":
-						if len(x) <2 {
+						if len(x) < 2 {
 							return x, errors.New("Not enough elements to swap.")
 						} else {
 							x = append(x, x[len(x)-2])
@@ -133,10 +133,8 @@ func Forth(input []string) ([]int, error) {
 
 				}
 
-				//				fmt.Printf("operator=%s\n", token)
 			}
 
-			//			fmt.Println("token=", token)
 		}
 	}
 
@@ -159,78 +157,67 @@ func match(input []string) (result []string) {
 		// the first token must be alphabet with hyphen
 
 		s = strings.ToUpper(s)
-		
-/*
-		operator := opr.FindString(s) 
-		if operator != "" {
-			panic("operator found!")
-			fmt.Println("operator found.", operator)
-			return output
-		}
-*/ 
-//		opr := regexp.MustCompile(`^: (?P<marco>[\+\-\*\/]) (?P<details>.*) ;$`)
-pattern := `^: (?P<marco>[a-zA-Z.+-/*\-]+) (?P<details>.*) ;$`
+
+		pattern := `^: (?P<marco>[a-zA-Z.+-/*\-]+) (?P<details>.*) ;$`
 		cmd := regexp.MustCompile(pattern)
 
 		matched := cmd.FindString(s)
 
 		if matched == "" {
-			
+
 			output = append(output, s)
 			continue
 		}
+		/*
 
 		fmt.Println("matched :", matched)
 		fmt.Println("matched len:", len(matched))
-		//removing leading : and trailing ;
-		// From ": hello over over ;"
-		// To   "hello over over"
-//		matched = matched[2 : len(matched)-2]
-//		fmt.Println("matched shrinked:", matched)
 
-//		re := regexp.MustCompile(pattern)
-//		results := re.FindStringSubmatch(matched)
-
-		results := cmd.FindStringSubmatch(matched)
 		fmt.Println("results shrinked:", results)
-
-//		marco := re.SubexpIndex("marco")
-//		details := re.SubexpIndex("details")
-
+*/
 		marco := cmd.SubexpIndex("marco")
 		details := cmd.SubexpIndex("details")
-/*d10
-		v, ok := lookup[results[marco]]
-		if ok {
-		temp := regexp.MustCompile(v)
-		for i, _ := range output {
-			output[i] = temp.ReplaceAllString(output[i], v)
+		results := cmd.FindStringSubmatch(matched)
+
+		leftValue := results[marco]
+		rightValue := results[details]
+
+		fmt.Println(lookup)
+
+		if val, ok := lookup[rightValue]; ok {
+			delete(lookup, rightValue)
+			lookup[rightValue] = val
+		fmt.Println("right value found", val)
+		} 
+
+		if val, ok := lookup[leftValue]; ok {
+			delete(lookup, leftValue)
+		fmt.Println("left value deleted", val)
 		}
-		lookup[results[marco]] = v
-		}
-		*/
+	
 
+		fmt.Println("left", leftValue)
+		fmt.Println("right", rightValue)
 
-
-		lookup[results[marco]] = results[details]
+//		lookup[results[marco]] = results[details]
+		lookup[leftValue] = rightValue
 	}
 
 	fmt.Println("maps:", lookup)
 	fmt.Println("output:", output)
 
-
 	for token, value := range lookup {
-			fmt.Println("token", token)
-			switch token {
-			case "+":
-				token = "\\+"
-			case "-":
-				token = "\\-"
-			case "*":
-				token = "\\*"
-			case "\\":
-			default:
-			}
+		fmt.Println("token", token)
+		switch token {
+		case "+":
+			token = "\\+"
+		case "-":
+			token = "\\-"
+		case "*":
+			token = "\\*"
+		case "\\":
+		default:
+		}
 		temp := regexp.MustCompile(token)
 		for i, _ := range output {
 			output[i] = temp.ReplaceAllString(output[i], value)
@@ -240,4 +227,3 @@ pattern := `^: (?P<marco>[a-zA-Z.+-/*\-]+) (?P<details>.*) ;$`
 	return output
 
 }
-
