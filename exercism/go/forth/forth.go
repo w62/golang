@@ -185,14 +185,24 @@ func match(input []string) (result []string) {
 		fmt.Println(lookup)
 
 		if val, ok := lookup[rightValue]; ok {
-			delete(lookup, rightValue)
-			lookup[rightValue] = val
-		fmt.Println("right value found", val)
+//			delete(lookup, rightValue)
+			rightValue = val
+		fmt.Println("right value found", rightValue)
 		} 
 
+		if len(strings.SplitN(rightValue, " ", -1)) > 0 {
+			fmt.Println(rightValue, "contains more tokens.")
+			fmt.Println("its leftvalue is", leftValue)
+			if val, ok := lookup[leftValue]; ok {
+				fmt.Println("to be replaced", val)
+				rightValue = strings.ReplaceAll(rightValue, leftValue, val)
+				fmt.Println("final", rightValue)
+			}
+		}
+
 		if val, ok := lookup[leftValue]; ok {
-			delete(lookup, leftValue)
-		fmt.Println("left value deleted", val)
+//			delete(lookup, leftValue)
+		fmt.Println("left value ", leftValue, "value", val)
 		}
 	
 
