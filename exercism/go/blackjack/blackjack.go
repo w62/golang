@@ -1,5 +1,9 @@
 package blackjack
 
+import (
+	"fmt"
+)
+
 // ParseCard returns the integer value of a card following blackjack ruleset.
 func ParseCard(card string) int {
 	value := 0
@@ -51,10 +55,12 @@ func FirstTurn(card1, card2, dealerCard string) string {
 	if card2 == "ace" {
 		aces ++
 	}
-
+/*
 	if dealerCard == "ace" {
 		aces ++
 	}
+*/
+	fmt.Println("aces=", aces)
 
 	if aces >= 2 {
 		result = "P"
