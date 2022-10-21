@@ -1,7 +1,4 @@
 package lasagna
-import (
-	"fmt"
-)
 
 // TODO: define the 'PreparationTime()' function
 
@@ -12,8 +9,6 @@ func PreparationTime (layers []string, time int) int {
 	} else {
 		localtime = time 
 	}
-
-	fmt.Println("layers=", len(layers), " localtime=", localtime)
 
 	return len(layers) * localtime
 
@@ -39,16 +34,18 @@ func Quantities (layers []string)(int, float64) {
 }
 
 // TODO: define the 'AddSecretIngredient()' function
-func AddSecretIngredient( ingredient1, ingredient2 []string) {
+func AddSecretIngredient( friendList, myList []string) {
+
+	myList[len(myList)-1] = friendList[len(friendList)-1]
+
 }
 
 // TODO: define the 'ScaleRecipe()' function
 
 func ScaleRecipe (portion1 []float64, qty int) []float64 {
 	var result []float64
-	fmt.Println("qty=", qty)
 	for i := 0; i< len(portion1); i++ {
-		result = append(result, portion1[i] * 2 )
+		result = append(result, portion1[i] *   float64(qty) / 2 )
 	}
 	return result
 }
