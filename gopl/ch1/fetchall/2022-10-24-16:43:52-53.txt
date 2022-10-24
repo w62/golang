@@ -1,0 +1,7 @@
+<script>
+if (window.location.href.indexOf("video.now.com") > -1) {
+	document.location="http://video.now.com/home/video";
+} else {
+	document.location="http://now.com/home";
+}
+</script>
