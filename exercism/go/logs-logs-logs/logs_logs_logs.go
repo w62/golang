@@ -1,8 +1,7 @@
 package logs
 
 import (
-//	"fmt"
-//	"unicode/utf8"
+	"unicode/utf8"
 	"strings"
 )
 
@@ -35,11 +34,20 @@ func Application(log string) string {
 // Replace replaces all occurrences of old with new, returning the modified log
 // to the caller.
 func Replace(log string, oldRune, newRune rune) string {
+	r := []rune(log)
+
+	for i, _ := range r {
+		if r[i] == oldRune {
+			r[i] = newRune
+		}
+	}
+	return string(r)
 	panic("Please implement the Replace() function")
 }
 
 // WithinLimit determines whether or not the number of characters in log is
 // within the limit.
 func WithinLimit(log string, limit int) bool {
+	return utf8.RuneCountInString(log) <= limit
 	panic("Please implement the WithinLimit() function")
 }
