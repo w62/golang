@@ -43,33 +43,22 @@ func RemoveEndOfLineText(text string) string {
 		return text
 	}
 		return re.ReplaceAllString(text, "")
-/*
-	for _, v := range tmpslice {
-	}
-
-	*/
 //	return text
 	panic("Please implement the RemoveEndOfLineText function")
 }
 
 func TagWithUserName(lines []string) []string {
-//	txt := `User +.*`
-//	txt := `(User +\w*)`
 	 txt := `(?P<tug>User +)(?P<username>\w*)(?P<ignore>.*)`
-//	txt :=	`(?P<tug>User +)(?P<username>\w*)(?P<ignore>.*)`
 	re := regexp.MustCompile(txt)
 
+	remark := ""
 			fmt.Printf("lines=%v, type of lines %T\n", lines, lines)
-	for _, v := range lines {
+	for i, v := range lines {
 		if j := re.FindStringSubmatch(v); j != nil {
 
-			fmt.Printf("j[0]=%v, type of j[0] %T\n", j[0], j[0])
-			fmt.Printf("v=%v, type of v %T\n", v, v)
-			re.MatchString(j[0])
-			key := re.SubexpNames()[2]
+			remark = fmt.Sprintf("[USR] %s", j[2])
+			lines [i] = fmt.Sprintf("%s %s", remark, v)
 
-			fmt.Printf("s1=%s s2=%s value=%s\n", 
-			re.SubexpNames()[1], re.SubexpNames()[2], key)
 		}
 	}
 
