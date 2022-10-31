@@ -17,12 +17,7 @@ type NumberBox interface {
 
 // DescribeNumberBox should return a string describing the NumberBox.
 func DescribeNumberBox(nb NumberBox) string {
-	var dummy FancyNumberBox
-	if reflect.TypeOf(dummy) == reflect.TypeOf(nb) {
-	return fmt.Sprintf("This is a fancy box containing the number %.1f", float64(nb.Number()))
-} else {
-	return fmt.Sprintf("This is a fancy box containing the number 0.0")
-}
+	return fmt.Sprintf("This is a box containing the number %.1f", float64(nb.Number()))
 	panic("Please implement DescribeNumberBox")
 }
 
@@ -59,10 +54,33 @@ func ExtractFancyNumber(fnb FancyNumberBox) int {
 
 // DescribeFancyNumberBox should return a string describing the FancyNumberBox.
 func DescribeFancyNumberBox(fnb FancyNumberBox) string {
+	var dummy FancyNumber
+
+	if reflect.TypeOf(dummy) == reflect.TypeOf(fnb) {
+		 val, err := strconv.ParseFloat(fnb.Value(),32)
+	if	 err != nil {
+			return ""
+		}
+	return fmt.Sprintf("This is a fancy box containing the number %.1f", val)
+} else {
+	return fmt.Sprintf("This is a fancy box containing the number 0.0")
+}
 	panic("Please implement DescribeFancyNumberBox")
 }
 
 // DescribeAnything should return a string describing whatever it contains.
 func DescribeAnything(i interface{}) string {
+	switch v:=i.(type){
+	case int:
+		return DescribeNumber(float64(v))
+	case float64:
+		return DescribeNumber(v)
+	case NumberBox:
+		return DescribeNumberBox(v)
+	case FancyNumberBox:
+		return DescribeFancyNumberBox(v)
+	default:
+		return "Return to sender"
+	}
 	panic("Please implement DescribeAnything")
 }
