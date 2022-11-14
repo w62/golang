@@ -19,6 +19,9 @@ type Node struct {
 }
 
 func remove(slice []Record, s int) []Record {
+	if len(slice) <= 1 {
+		return nil
+	}
 	return append(slice[:s], slice[s+1:]...)
 }
 
@@ -41,6 +44,7 @@ func duplicate(slice []Record) bool {
 func Build(records []Record) (*Node, error) {
 
 	var root *Node
+	var next *Node
 	var rootRecord int
 
 	//check for 0 or zero records
@@ -69,9 +73,9 @@ func Build(records []Record) (*Node, error) {
 		}
 
 		if r.ID != 0 && r.Parent != 0 {
-			if r.ID > r.Parent {
-			return nil, errors.New("ID larger than Parent")
-		}
+			if r.Parent > r.ID {
+				return nil, errors.New("ID larger than Parent")
+			}
 		}
 	}
 
@@ -90,67 +94,30 @@ func Build(records []Record) (*Node, error) {
 
 	records = remove(records, rootRecord)
 
+	records = sortrecord(records)
 	// If the root is not the only node, then construct the tree
 
 	if records != nil {
 		kids := children(records, 0)
 
 		n.Children = kids
-		fmt.Printf("kids=%v records=%v\n", n.Children, records)
+
+		for len(records) > 0 {
+
+			for i, val := range kids {
+				next = val
+				fmt.Printf("records=%v\n", records)
+				fmt.Printf("kids=%v records=%v\n", n.Children, records)
+				next.Children = children(records, next.ID)
+				fmt.Printf("after records=%v\n", records)
+				fmt.Printf("Build i=%d next=%v next.ID=%v next.Children=%v \n", i, next, next.ID, next.Children)
+			}
+		}
+
 	}
 
 	root = &n
 
-	/*
-
-
-		var tree map[int]int
-
-		tree = make(map[int]int)
-
-
-
-		for i := 0; i <len(records); i++ {
-			fmt.Printf("%d ID=%d Parent=%d\n",i, records[i].ID, records[i].Parent)
-			tree [records[i].Parent]++
-		}
-
-		fmt.Println("tree map[int]int=", tree)
-
-		for val, _ := range  tree {
-
-		fmt.Printf("Parent %d has %d childs.\n",val, tree[val])
-	}
-
-		records = sortrecord(records)
-		fmt.Println("After removing root and sort, there are", len(records), " records. Data ", records)
-
-
-		for len(records) > 0 {
-
-			for i := 0; i < len(records); i++ {
-				if records[i].Parent == (*next).ID{
-					n := Node{
-						ID:       records[i].ID,
-						Children: nil,
-					}
-					fmt.Println("n=",n)
-
-					kids := children(records,(*next).ID)
-					(*next).Children = append((*next).Children, &n)
-					fmt.Println("number kids=", len(kids), " kids=", kids)
-
-					if kids == nil {
-
-					next = (*next).Children[0]
-				}
-			fmt.Println("before records=", records)
-					records = remove(records, i)
-			fmt.Println("after records=", records)
-
-				}
-			}
-		}*/
 	return root, nil
 	panic("Please implement the Build function")
 }
@@ -158,9 +125,9 @@ func Build(records []Record) (*Node, error) {
 func children(list []Record, pid int) []*Node {
 
 	var child []*Node
-	j := len(list)
+	var new_list []Record
 
-	for i := 0; i < len(list); i++ {
+	for i, _ := range list {
 
 		if list[i].Parent == pid {
 			n := Node{
@@ -168,10 +135,15 @@ func children(list []Record, pid int) []*Node {
 				Children: nil,
 			}
 			child = append(child, &n)
-			list = remove(list, i)
+		} else {
+			new_list = append(new_list, list[i])
 		}
+
+		fmt.Println("inside children i=", i)
 	}
+	list = new_list
 	fmt.Println("child=", child)
+	fmt.Println("new_list=", new_list)
 	return child
 }
 
