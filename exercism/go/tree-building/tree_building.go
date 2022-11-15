@@ -1,159 +1,50 @@
 package tree
-
 import (
-	"errors"
 	"fmt"
-	"sort"
 )
-
+const rootID = 0
 type Record struct {
-	ID     int
-	Parent int
-	// feel free to add fields as you see fit
+	ID, Parent int
 }
-
 type Node struct {
 	ID       int
 	Children []*Node
-	// feel free to add fields as you see fit
 }
-
-func remove(slice []Record, s int) []Record {
-	if len(slice) <= 1 {
-		return nil
-	}
-	return append(slice[:s], slice[s+1:]...)
-}
-
-func duplicate(slice []Record) bool {
-	if len(slice) == 1 {
-		return false
-	}
-	for i := 0; i < len(slice); i++ {
-		for j := i + 1; j < len(slice); j++ {
-			if slice[i].ID == slice[j].ID &&
-				slice[i].Parent == slice[j].Parent {
-				fmt.Println("i=", i, "j=", j)
-				fmt.Println("slice[i]", slice[i], "slice[j]", slice[j])
-				return true
-			}
-		}
-	}
-	return false
-}
+// Build converts an unordered slice of Records into a hierarchical tree of Nodes,
+// after validating that the tree is not a graph and that the records have
+// a contiguous range of IDs.
 func Build(records []Record) (*Node, error) {
-
-	var root *Node
-	var next *Node
-	var rootRecord int
-
-	//check for 0 or zero records
-	if len(records) <= 0 {
+	if len(records) == 0 {
 		return nil, nil
 	}
-
-	// Print out the initial data for verification
-	fmt.Println("There are", len(records), " records.")
-	fmt.Println("The entire data set is", records)
-	if duplicate(records) {
-		return nil, errors.New("Duplicate records")
-	}
-
-	// number of root checking
-	// There should be one and only one root, no more no less
-
-	numberOfRoots := 0
-
+	positions := make([]int, len(records))
 	for i, r := range records {
-		fmt.Printf("r.ID=%d r.Parent=%d\n", r.ID, r.Parent)
-		if r.ID == r.Parent {
-			rootRecord = i
-			fmt.Println("in loop r=", r, " RootRecord", rootRecord)
-			numberOfRoots++
+		if r.ID < rootID || r.ID >= len(records) {
+			return nil, fmt.Errorf("out of bounds record id %d", r.ID)
 		}
-
-		if r.ID != 0 && r.Parent != 0 {
-			if r.Parent > r.ID {
-				return nil, errors.New("ID larger than Parent")
-			}
+		positions[r.ID] = i
+		fmt.Printf("i=%d positions[%d]=%d r.ID=%d r.Parent=%d \n", i, r.ID, positions[r.ID], r.ID, r.Parent)
+	}
+	nodes := make([]Node, len(records))
+	fmt.Println("After make []Node ")
+	for i := range positions {
+		r := records[positions[i]]
+		fmt.Printf("i=%d r.ID=%d r.Parent=%d  ",i,  r.ID, r.Parent)
+		if r.ID != i {
+		fmt.Printf("r.ID != i - r.ID=%d i=%d \n",  r.ID, i)
+			return nil, fmt.Errorf("non-contiguous node %d (want %d)", r.ID, i)
+		}
+		validParentForChild := (r.ID > r.Parent) || (r.ID == rootID && r.Parent == rootID)
+		if !validParentForChild {
+			return nil, fmt.Errorf("node %d has impossible parent %d", r.ID, r.Parent)
+		}
+		fmt.Printf("node[i].ID=%d ", nodes[i].ID)
+		nodes[i].ID = i
+		fmt.Printf(" After nodes[i].ID = i i=%d r.ID=%d r.Parent=%d  \n",i,  r.ID, r.Parent)
+		if i != rootID {
+			p := &nodes[r.Parent]
+			p.Children = append(p.Children, &nodes[i])
 		}
 	}
-
-	if numberOfRoots != 1 {
-		return nil, errors.New("not one and only one root")
-	}
-	// end of number of root checking
-
-	fmt.Println("RootRecord", rootRecord)
-	fmt.Println("root node is ", rootRecord, "value", records[rootRecord])
-
-	n := Node{
-		ID:       records[rootRecord].ID,
-		Children: nil,
-	}
-
-	records = remove(records, rootRecord)
-
-	records = sortrecord(records)
-	// If the root is not the only node, then construct the tree
-
-	if records != nil {
-		kids := children(records, 0)
-
-		n.Children = kids
-
-		for len(records) > 0 {
-
-			for i, val := range kids {
-				next = val
-				fmt.Printf("records=%v\n", records)
-				fmt.Printf("kids=%v records=%v\n", n.Children, records)
-				next.Children = children(records, next.ID)
-				fmt.Printf("after records=%v\n", records)
-				fmt.Printf("Build i=%d next=%v next.ID=%v next.Children=%v \n", i, next, next.ID, next.Children)
-			}
-		}
-
-	}
-
-	root = &n
-
-	return root, nil
-	panic("Please implement the Build function")
-}
-
-func children(list []Record, pid int) []*Node {
-
-	var child []*Node
-	var new_list []Record
-
-	for i, _ := range list {
-
-		if list[i].Parent == pid {
-			n := Node{
-				ID:       list[i].ID,
-				Children: nil,
-			}
-			child = append(child, &n)
-		} else {
-			new_list = append(new_list, list[i])
-		}
-
-		fmt.Println("inside children i=", i)
-	}
-	list = new_list
-	fmt.Println("child=", child)
-	fmt.Println("new_list=", new_list)
-	return child
-}
-
-func sortrecord(list []Record) []Record {
-	sort.Slice(list, func(i, j int) bool {
-		if list[i].Parent == list[j].Parent {
-			return list[i].ID < list[j].ID
-		}
-		return list[i].Parent < list[j].Parent
-	})
-
-	return list
+	return &nodes[0], nil
 }

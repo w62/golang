@@ -1,0 +1,189 @@
+package oldtree
+
+import (
+	"errors"
+	"fmt"
+	"sort"
+)
+
+type Record struct {
+	ID     int
+	Parent int
+	// feel free to add fields as you see fit
+}
+
+type Node struct {
+	ID       int
+	Parent   int
+	Children []*Node
+	// feel free to add fields as you see fit
+}
+
+func Build(records []Record) (*Node, error) {
+
+	var root *Node
+	var rootRecord int
+
+	var vine []*Node
+
+	//check for 0 or zero records
+	if len(records) <= 0 {
+		return nil, nil
+	}
+	// check for non-continuous tree
+	// essentially loop every element to check if a match is found
+	var match int
+	for i, _ := range records {
+		for j, _ := range records {
+			//			fmt.Printf("i=%d j=%d records[j].ID=%d\n", i, j, records[j].ID)
+			if i == records[j].ID {
+				//				fmt.Printf("equal\n")
+				match++
+				break
+			}
+		}
+	}
+
+	// The matches should be the same as the length of the records
+	// no more, no less
+
+	if match != len(records) {
+		return nil, errors.New("non-continuous tree.")
+	}
+
+	// check for duplicate roots
+	if duplicate(records) {
+		return nil, errors.New("Duplicate records")
+	}
+
+	// number of root checking
+	// There should be one and only one root, no more no less
+
+	numberOfRoots := 0
+	// At this point, the records should contain a proper tree
+	// looping for the records again
+
+	for i, r := range records {
+		fmt.Printf("r.ID=%d r.Parent=%d\n", r.ID, r.Parent)
+
+		// Construct a vine of Nodes. Each Node correspond to a record
+		bud := Node{
+			ID:     r.ID,
+			Parent: r.Parent,
+		}
+		vine = append(vine, &bud)
+
+		// Record the root node
+		if r.ID == r.Parent {
+			rootRecord = i
+			fmt.Println("in loop r=", r, " RootRecord", rootRecord)
+			numberOfRoots++
+		}
+
+		// check of ID larger than Parent
+		if r.ID != 0 && r.Parent != 0 {
+			if r.Parent > r.ID {
+				return nil, errors.New("ID larger than Parent")
+			}
+		}
+	}
+
+	if numberOfRoots != 1 {
+		return nil, errors.New("not one and only one root")
+	}
+	// end of number of root checking
+
+	// Print out the initial data for verification
+	fmt.Println("There are", len(records), " records.")
+	fmt.Println("The entire data set is", records)
+	fmt.Println("RootRecord", rootRecord)
+	fmt.Println("root node is ", rootRecord, "value", records[rootRecord])
+
+	for j, _ := range vine {
+		fmt.Printf("vine %d ID=%d Parent=%d\n", j, vine[j].ID, vine[j].Parent)
+	}
+
+	fmt.Printf("root is vine %d ID=%d Parent=%d\n", rootRecord,
+		vine[rootRecord].ID, vine[rootRecord].Parent)
+
+	fmt.Println("From now on, working on the vine and forget about the record.")
+
+	root = vine[rootRecord]
+	vine = removeNode(vine, rootRecord)
+
+	for id, _ := range vine {
+		fmt.Printf("id=%d vine[%d].ID=%d vine.[%d].Parent=%d\n", id, id, vine[id].ID, id, vine[id].Parent)
+
+		for parent, _ := range vine {
+			if vine[id].ID == vine[parent].Parent {
+				fmt.Printf("=> vine[%d].ID=%d vine.[%d].Parent=%d\n", id, vine[id].ID, parent, vine[parent].Parent)
+				vine[id].Children = append(vine[id].Children, vine[parent])
+				vine[id].Children = sortvine(vine[id].Children)
+				fmt.Printf("vine[%d].Children=%v\n", parent, vine[parent].Children)
+			}
+			fmt.Printf("parent=%d vine[%d].ID=%d vine.[%d].Parent=%d\n", parent, parent, vine[parent].ID, parent, vine[parent].Parent)
+		}
+	}
+	for i, _ := range vine {
+		if vine[i].Parent == 0 {
+			root.Children = append(root.Children, vine[i])
+			root.Children = sortvine(root.Children)
+		}
+	}
+
+	for j, _ := range vine {
+		fmt.Printf("After removing root: vine %d ID=%d Parent=%d Children=%v\n", j, vine[j].ID, vine[j].Parent, vine[j].Children)
+	}
+	vine = sortvine(vine)
+
+	for j, _ := range vine {
+		fmt.Printf("Sort After removing root: vine %d ID=%d Parent=%d Children=%v\n", j, vine[j].ID, vine[j].Parent, vine[j].Children)
+	}
+
+	return root, nil
+	panic("Please implement the Build function")
+}
+
+func sortvine(list []*Node) []*Node {
+	sort.Slice(list, func(i, j int) bool {
+		if list[i].Parent == list[j].Parent {
+			return list[i].ID < list[j].ID
+		}
+		fmt.Printf("list[%d].ID=%d ", i, list[i].ID)
+		fmt.Printf("list[%d].ID=%d\n", j, list[j].ID)
+		return list[i].ID > list[j].ID
+	})
+
+	return list
+}
+
+func remove(slice []Record, s int) []Record {
+	if len(slice) <= 1 {
+		return nil
+	}
+	return append(slice[:s], slice[s+1:]...)
+}
+
+func removeNode(slice []*Node, s int) []*Node {
+	if len(slice) <= 1 {
+		return nil
+	}
+	return append(slice[:s], slice[s+1:]...)
+}
+
+func duplicate(slice []Record) bool {
+	if len(slice) == 1 {
+		return false
+	}
+	for i := 0; i < len(slice); i++ {
+		for j := i + 1; j < len(slice); j++ {
+			if slice[i].ID == slice[j].ID &&
+				slice[i].Parent == slice[j].Parent {
+				fmt.Println("i=", i, "j=", j)
+				fmt.Println("slice[i]", slice[i], "slice[j]", slice[j])
+				return true
+			}
+		}
+	}
+	return false
+}
