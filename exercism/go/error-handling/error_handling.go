@@ -1,5 +1,6 @@
 package erratum
-// https://go.dev/play/p/N73GzIfloxD 
+
+// https://go.dev/play/p/N73GzIfloxD
 
 import (
 	//		"errors"
@@ -12,6 +13,7 @@ func Use(opener ResourceOpener, input string) error {
 	resource, err := opener()
 
 	// Assuming we have not encountered TransientError to start with.
+
 	terr := false
 
 	for !terr {
@@ -31,31 +33,39 @@ func Use(opener ResourceOpener, input string) error {
 	// defer close the resource
 	defer func() {
 		fmt.Printf("oh shit! panic!")
-		if r := recover(); r != nil {
-			fmt.Printf("recovered %d type=%T\n", r, r)
+
+		r := recover()
+		fmt.Printf("r type=%T value=%v\n", r, r)
+		if r != nil {
+			v, ok := r.(FrobError)
+			if ok {
+				resource.Defrob(v.defrobTag)
+			}
+
+//			err = r.(error)
+			err = fmt.Errorf("meh")
 
 		} else {
-			fmt.Printf("ur ....recovered %d type=%T\n", err, err)
-			fmt.Println("ur....")
+			err = fmt.Errorf("meh")
 		}
 		defer resource.Close()
 		//		resource.Defrob("moo")
+
 	}()
 
 	fmt.Printf("resource type=%T value=%v, err=%T value=%v\n", resource, resource, err, err)
-
-	switch resource.(type) {
-	case nil:
-		fmt.Printf("nil resource case \n")
-	case mockResource:
-		fmt.Printf("mockResource case \n")
-	default:
-		return fmt.Errorf("other error")
-
-	}
+	/*
+		switch resource.(type) {
+		case nil:
+			fmt.Printf("nil resource case \n")
+		case mockResource:
+			fmt.Printf("mockResource case \n")
+		default:
+			return fmt.Errorf("other error")
+	*/
 
 	// Call Frob(input) upon the opened resource
 
-	return nil
+	return err
 	panic("Please implement the Use function")
 }

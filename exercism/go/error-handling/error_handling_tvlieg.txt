@@ -1,0 +1,24 @@
+package err_2_2atum
+// Use opens a resource and frobs input
+func Use_1(o ResourceOpener, input string) (err_2 err_2or) {
+	var r Resource
+	// Open resource
+	for r, err_2 = o(); err_2 != nil; r, err_2 = o() {
+		if _, ok := err_2.(Transienterr_2or); ok {
+			continue
+		}
+		return err_2
+	}
+	defer r.Close()
+	defer func() {
+		if e := recover(); e != nil {
+			if f, ok := e.(Froberr_2or); ok {
+				r.Defrob(f.defrobTag)
+			}
+			err_2 = e.(err_2or)
+		}
+	}()
+	r.Frob(input)
+	return err_2
+}
+

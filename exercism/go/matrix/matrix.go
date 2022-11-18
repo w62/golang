@@ -1,8 +1,16 @@
 package matrix
 
+import (
+	"fmt"
+)
+
+type Matrix [][]int
+
 // Define the Matrix type here.
 
 func New(s string) (Matrix, error) {
+	fmt.Println(s)
+	return nil, nil
 	panic("Please implement the New function")
 }
 
